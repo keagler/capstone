@@ -1,0 +1,207 @@
+{
+	"info": {
+		"_postman_id": "4e8a313f-2a54-4869-8944-ab74f7928976",
+		"name": "REMINDER",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "1-GET REMINDERS",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJodHRwczovL2tlYWdsZXIuZXUuYXV0aDAuY29tLyIsInN1YiI6Imdvb2dsZS1vYXV0aDJ8MTAxNzY5NzczMjE4NzExOTAzMzc4IiwiYXVkIjoiMjhaaVNGUUV6QTYzb1VJVG9scjRWdnpkQ212Nlc4YTUiLCJpYXQiOjE1OTIyNDM2NzMsImV4cCI6MTU5MjY3NTY3MywiYXRfaGFzaCI6IlRXQjNNZ2c4V2YzeV9JMkx3a2wtbVEiLCJub25jZSI6Im4tSGo4MGZxM1ltLUxnQjlJWFp6SnJMVGZVdS5WfnQ0In0.ckIZGsjuUk7CzxhMPuNfNTbD_CCqPtTX5GFc8LreDkg",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "https://{{apiid}}.execute-api.us-east-1.amazonaws.com/dev/reminders",
+					"protocol": "https",
+					"host": [
+						"{{apiid}}",
+						"execute-api",
+						"us-east-1",
+						"amazonaws",
+						"com"
+					],
+					"path": [
+						"dev",
+						"reminders"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "2-CREATE REMINDER",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJodHRwczovL2tlYWdsZXIuZXUuYXV0aDAuY29tLyIsInN1YiI6Imdvb2dsZS1vYXV0aDJ8MTAxNzY5NzczMjE4NzExOTAzMzc4IiwiYXVkIjoiMjhaaVNGUUV6QTYzb1VJVG9scjRWdnpkQ212Nlc4YTUiLCJpYXQiOjE1OTIyNDM2NzMsImV4cCI6MTU5MjY3NTY3MywiYXRfaGFzaCI6IlRXQjNNZ2c4V2YzeV9JMkx3a2wtbVEiLCJub25jZSI6Im4tSGo4MGZxM1ltLUxnQjlJWFp6SnJMVGZVdS5WfnQ0In0.ckIZGsjuUk7CzxhMPuNfNTbD_CCqPtTX5GFc8LreDkg",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"plannedDate\":\"DATE3\",\"location\":\"444444444444\",\"description\":\"44444444444444\",\"duration\":40}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://{{apiid}}.execute-api.us-east-1.amazonaws.com/dev/reminders",
+					"protocol": "https",
+					"host": [
+						"{{apiid}}",
+						"execute-api",
+						"us-east-1",
+						"amazonaws",
+						"com"
+					],
+					"path": [
+						"dev",
+						"reminders"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "3-PATCH-UPDATE-REMINDER",
+			"request": {
+				"method": "PATCH",
+				"header": [
+					{
+						"key": "Authorization",
+						"type": "text",
+						"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJodHRwczovL2tlYWdsZXIuZXUuYXV0aDAuY29tLyIsInN1YiI6Imdvb2dsZS1vYXV0aDJ8MTAxNzY5NzczMjE4NzExOTAzMzc4IiwiYXVkIjoiMjhaaVNGUUV6QTYzb1VJVG9scjRWdnpkQ212Nlc4YTUiLCJpYXQiOjE1OTIyNDM2NzMsImV4cCI6MTU5MjY3NTY3MywiYXRfaGFzaCI6IlRXQjNNZ2c4V2YzeV9JMkx3a2wtbVEiLCJub25jZSI6Im4tSGo4MGZxM1ltLUxnQjlJWFp6SnJMVGZVdS5WfnQ0In0.ckIZGsjuUk7CzxhMPuNfNTbD_CCqPtTX5GFc8LreDkg"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"plannedDate\": \"DATE3555555555\",\n    \"location\": \"LOC333333\",\n    \"description\": \"DES3\",\n    \"duration\": 300,\n    \"isCompleted\":true\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://{{apiid}}.execute-api.us-east-1.amazonaws.com/dev/reminders/9e3efb69-6472-4b18-8efb-41f0bfd8ec4c",
+					"protocol": "https",
+					"host": [
+						"{{apiid}}",
+						"execute-api",
+						"us-east-1",
+						"amazonaws",
+						"com"
+					],
+					"path": [
+						"dev",
+						"reminders",
+						"9e3efb69-6472-4b18-8efb-41f0bfd8ec4c"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "4-DELETE REMINDER",
+			"request": {
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "Authorization",
+						"type": "text",
+						"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJodHRwczovL2tlYWdsZXIuZXUuYXV0aDAuY29tLyIsInN1YiI6Imdvb2dsZS1vYXV0aDJ8MTAxNzY5NzczMjE4NzExOTAzMzc4IiwiYXVkIjoiMjhaaVNGUUV6QTYzb1VJVG9scjRWdnpkQ212Nlc4YTUiLCJpYXQiOjE1OTIyNDM2NzMsImV4cCI6MTU5MjY3NTY3MywiYXRfaGFzaCI6IlRXQjNNZ2c4V2YzeV9JMkx3a2wtbVEiLCJub25jZSI6Im4tSGo4MGZxM1ltLUxnQjlJWFp6SnJMVGZVdS5WfnQ0In0.ckIZGsjuUk7CzxhMPuNfNTbD_CCqPtTX5GFc8LreDkg"
+					}
+				],
+				"url": {
+					"raw": "https://{{apiid}}.execute-api.us-east-1.amazonaws.com/dev/reminders/9e3efb69-6472-4b18-8efb-41f0bfd8ec4c",
+					"protocol": "https",
+					"host": [
+						"{{apiid}}",
+						"execute-api",
+						"us-east-1",
+						"amazonaws",
+						"com"
+					],
+					"path": [
+						"dev",
+						"reminders",
+						"9e3efb69-6472-4b18-8efb-41f0bfd8ec4c"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "5-GET_REMINDER_IMAGES",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"type": "text",
+						"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJodHRwczovL2tlYWdsZXIuZXUuYXV0aDAuY29tLyIsInN1YiI6Imdvb2dsZS1vYXV0aDJ8MTAxNzY5NzczMjE4NzExOTAzMzc4IiwiYXVkIjoiMjhaaVNGUUV6QTYzb1VJVG9scjRWdnpkQ212Nlc4YTUiLCJpYXQiOjE1OTIyNDM2NzMsImV4cCI6MTU5MjY3NTY3MywiYXRfaGFzaCI6IlRXQjNNZ2c4V2YzeV9JMkx3a2wtbVEiLCJub25jZSI6Im4tSGo4MGZxM1ltLUxnQjlJWFp6SnJMVGZVdS5WfnQ0In0.ckIZGsjuUk7CzxhMPuNfNTbD_CCqPtTX5GFc8LreDkg"
+					}
+				],
+				"url": {
+					"raw": "https://{{apiid}}.execute-api.us-east-1.amazonaws.com/dev/images/9e3efb69-6472-4b18-8efb-41f0bfd8ec4c",
+					"protocol": "https",
+					"host": [
+						"{{apiid}}",
+						"execute-api",
+						"us-east-1",
+						"amazonaws",
+						"com"
+					],
+					"path": [
+						"dev",
+						"images",
+						"9e3efb69-6472-4b18-8efb-41f0bfd8ec4c"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "6-POST REMINDER IMAGES",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"type": "text",
+						"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJodHRwczovL2tlYWdsZXIuZXUuYXV0aDAuY29tLyIsInN1YiI6Imdvb2dsZS1vYXV0aDJ8MTAxNzY5NzczMjE4NzExOTAzMzc4IiwiYXVkIjoiMjhaaVNGUUV6QTYzb1VJVG9scjRWdnpkQ212Nlc4YTUiLCJpYXQiOjE1OTIyNDM2NzMsImV4cCI6MTU5MjY3NTY3MywiYXRfaGFzaCI6IlRXQjNNZ2c4V2YzeV9JMkx3a2wtbVEiLCJub25jZSI6Im4tSGo4MGZxM1ltLUxnQjlJWFp6SnJMVGZVdS5WfnQ0In0.ckIZGsjuUk7CzxhMPuNfNTbD_CCqPtTX5GFc8LreDkg"
+					}
+				],
+				"url": {
+					"raw": "https://{{apiid}}.execute-api.us-east-1.amazonaws.com/dev/reminders/a0598fda-8bba-4b9f-9023-c24b341be57f/image",
+					"protocol": "https",
+					"host": [
+						"{{apiid}}",
+						"execute-api",
+						"us-east-1",
+						"amazonaws",
+						"com"
+					],
+					"path": [
+						"dev",
+						"reminders",
+						"a0598fda-8bba-4b9f-9023-c24b341be57f",
+						"image"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"protocolProfileBehavior": {}
+}
