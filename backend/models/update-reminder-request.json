@@ -1,0 +1,24 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema",
+    "title": "update reminder request schema json",
+    "type":"object",
+    "properties": {
+        "plannedDate":{
+            "type":"string"
+        },
+        "location":{
+            "type":"string"
+        },
+        "description":{
+            "type":"string"
+        },
+        "duration": {
+            "type":"number"
+        },
+        "isCompleted": {
+            "type":"boolean"
+        }
+    },
+    "required":["plannedDate","location","description","duration","isCompleted"],
+    "additionalProperties": false
+}

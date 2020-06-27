@@ -1,0 +1,369 @@
+service:
+  name: serverless-reminder-kemalguler
+
+plugins:
+  - serverless-webpack
+  - serverless-iam-roles-per-function
+  - serverless-reqvalidator-plugin
+  - serverless-aws-documentation
+
+package:
+  individually: true
+
+custom:
+  webpack:
+    webpackConfig: ./webpack.config.js
+    includeModules: true
+  documentation:
+    api:
+      info:
+        version: v1.0.0
+        title: Self Managed Library API
+        description: Serverless Application for Self Managed Library
+    models:
+      - name: CreateTravelRequest
+        contentType: application/json
+        schema: ${file(models/create-reminder-request.json)}
+      - name: UpdateTravelRequest
+        contentType: application/json
+        schema: ${file(models/update-reminder-request.json)}
+  topicName: imageBucket-${self:provider.stage}
+
+provider:
+  name: aws
+  runtime: nodejs12.x
+  stage: ${opt:stage, 'dev'}
+  region: ${opt:region, 'us-east-1'}
+  environment:
+    REMINDER_TABLE: REMINDER-${self:provider.stage}
+    REMINDER_IMAGES_TABLE: REMINDER-IMAGES-${self:provider.stage}
+    APPNAME: serverless-reminder-app
+    JKWS_URL: https://keagler.eu.auth0.com/.well-known/jwks.json
+    REMINDER_IMAGES_S3_BUCKET: serverless-reminder-bucket-keagler-${self:provider.stage}
+    REMINDER_ID_INDEX: reminderIdIndex
+    USER_ID_INDEX: userIdIndex
+    SIGNED_URL_EXPIRATION: 300
+  tracing:
+    lambda: true
+    apiGateway: true
+    
+functions:
+
+  Auth:
+    handler: src/lambda/auth/auth0Authorizer.handler
+
+  GetReminders:
+    handler: src/lambda/http/getUserReminders.handler
+    events:
+      - http:
+          method: get
+          path: reminders
+          #authorizer: Auth
+          cors: true
+    iamRoleStatementsName: ${self:provider.environment.APPNAME}-${self:provider.stage}-GetRemindersLambdaRole
+    iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - dynamodb:Query
+      Resource: arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.REMINDER_TABLE}/index/${self:provider.environment.USER_ID_INDEX}
+    - Effect: Allow
+      Action:
+        - xray:PutTraceSegments
+        - xray:PutTelemetryRecords
+      Resource:
+        - "*"    
+    
+  CreateReminder:
+    handler: src/lambda/http/createReminder.handler
+    events:
+      - http:
+          method: post
+          path: reminders
+          #authorizer: Auth
+          cors: true
+          reqValidatorName: RequestBodyValidator
+          documentation:
+            summary: Create a New Reminder
+            description: Create a New Reminder
+            requestModels: 
+              'application/json': CreateTravelRequest
+    iamRoleStatementsName: ${self:provider.environment.APPNAME}-${self:provider.stage}-CreateRemindersLambdaRole
+    iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - dynamodb:PutItem
+      Resource: arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.REMINDER_TABLE}
+    - Effect: Allow
+      Action:
+        - xray:PutTraceSegments
+        - xray:PutTelemetryRecords
+      Resource:
+        - "*"
+
+  UpdateReminder:
+    handler: src/lambda/http/updateReminder.handler
+    events:
+      - http:
+          method: patch
+          path: reminders/{reminderId}
+          #authorizer: Auth
+          cors: true
+          reqValidatorName: RequestBodyValidator
+          documentation:
+            summary: Update Reminder
+            description: Update an existing reminder
+            requestModels:
+              'application/json': UpdateTravelRequest
+    iamRoleStatementsName: ${self:provider.environment.APPNAME}-${self:provider.stage}-UpdateReminderLambdaRole
+    iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - dynamodb:Query
+        - dynamodb:UpdateItem
+      Resource: arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.REMINDER_TABLE}
+    - Effect: Allow
+      Action:
+        - xray:PutTraceSegments
+        - xray:PutTelemetryRecords
+      Resource:
+        - "*"
+
+  DeleteReminder:
+    handler: src/lambda/http/deleteReminder.handler
+    events:
+      - http:
+          method: delete
+          path: reminders/{reminderId}
+          cors: true
+          #authorizer: Auth
+    iamRoleStatementsName: ${self:provider.environment.APPNAME}-${self:provider.stage}-DeleteReminderLambdaRole
+    iamRoleStatements:
+      - Effect: Allow
+        Action:
+          - dynamodb:Query
+          - dynamodb:DeleteItem
+        Resource: arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.REMINDER_TABLE}
+      - Effect: Allow
+        Action:
+          - dynamodb:Query
+          - dynamodb:DeleteItem
+        Resource: arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.REMINDER_IMAGES_TABLE}
+      - Effect: Allow
+        Action:
+          - s3:DeleteObject
+        Resource: arn:aws:s3:::${self:provider.environment.REMINDER_IMAGES_S3_BUCKET}/* 
+      - Effect: Allow
+        Action:
+          - xray:PutTraceSegments
+          - xray:PutTelemetryRecords
+        Resource:
+          - "*"
+
+  GenerateUploadImageUrl:
+    handler: src/lambda/http/generateUploadImageUrl.handler
+    events:
+      - http:
+          method: post
+          path: reminders/{reminderId}/image
+          #authorizer: Auth
+          cors: true
+    iamRoleStatementsName: ${self:provider.environment.APPNAME}-${self:provider.stage}-GetUploadImageUrlLambdaRole
+    iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - dynamodb:Query
+      Resource: arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.REMINDER_TABLE}
+    - Effect: Allow
+      Action:
+        - s3:GetObject
+        - s3:PutObject
+      Resource: arn:aws:s3:::${self:provider.environment.REMINDER_IMAGES_S3_BUCKET}/* 
+    - Effect: Allow
+      Action:
+        - xray:PutTraceSegments
+        - xray:PutTelemetryRecords
+      Resource:
+        - "*"
+        
+  ImagesTopicHandler:
+    handler: src/lambda/sns/imageTopicProcessor.handler
+    events:
+      - sns:
+          arn:
+            Fn::Join:
+              - ':'
+              - - arn:aws:sns
+                - Ref: AWS::Region
+                - Ref: AWS::AccountId
+                - ${self:custom.topicName}
+          topicName: ${self:custom.topicName}
+    iamRoleStatementsName: ${self:provider.environment.APPNAME}-${self:provider.stage}-ImagesTopicHandlerRole
+    iamRoleStatements:
+      - Effect: Allow
+        Action:
+          - dynamodb:Query
+          - dynamodb:UpdateItem
+        Resource: arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.REMINDER_TABLE}
+      - Effect: Allow
+        Action:
+          - xray:PutTraceSegments
+          - xray:PutTelemetryRecords
+        Resource:
+          - "*"
+      - Effect: Allow
+        Action:
+          - dynamodb:PutItem
+        Resource: arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.REMINDER_IMAGES_TABLE}
+  
+  GetReminderImages:
+    handler: src/lambda/http/getReminderImages.handler
+    events:
+      - http:
+          method: get
+          path: images/{reminderId}
+          #authorizer: Auth
+          cors: true
+    iamRoleStatementsName: ${self:provider.environment.APPNAME}-${self:provider.stage}-GetReminderImagesLambdaRole
+    iamRoleStatements:
+      - Effect: Allow
+        Action:
+          - dynamodb:Query
+        Resource: arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.REMINDER_TABLE}
+      - Effect: Allow
+        Action:
+          - dynamodb:Query
+        Resource: arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.REMINDER_IMAGES_TABLE}
+      - Effect: Allow
+        Action:
+          - xray:PutTraceSegments
+          - xray:PutTelemetryRecords
+        Resource:
+          - "*"   
+resources:
+  Resources:
+    GatewayResponseDefault4XX:
+      Type: AWS::ApiGateway::GatewayResponse
+      Properties:
+        ResponseParameters:
+          gatewayresponse.header.Access-Control-Allow-Origin: "'*'"
+          gatewayresponse.header.Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
+          gatewayresponse.header.Access-Control-Allow-Methods: "'GET,OPTIONS,POST'"
+        ResponseType: DEFAULT_4XX
+        RestApiId:
+          Ref: ApiGatewayRestApi
+
+    RemindersDynamoDBTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        AttributeDefinitions:
+          - AttributeName: userId
+            AttributeType: S
+          - AttributeName: id
+            AttributeType: S
+        KeySchema:
+          - AttributeName: userId
+            KeyType: HASH
+          - AttributeName: id
+            KeyType: RANGE
+        BillingMode: PAY_PER_REQUEST
+        TableName: ${self:provider.environment.REMINDER_TABLE}
+        GlobalSecondaryIndexes:
+          - IndexName: ${self:provider.environment.REMINDER_ID_INDEX}
+            KeySchema:
+              - AttributeName: id 
+                KeyType: HASH
+            Projection:
+              ProjectionType: ALL
+          - IndexName: ${self:provider.environment.USER_ID_INDEX}
+            KeySchema:
+              - AttributeName: userId 
+                KeyType: HASH
+            Projection:
+              ProjectionType: ALL
+    
+    ReminderImagesDynamoDBTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        AttributeDefinitions:
+          - AttributeName: travelId
+            AttributeType: S
+          - AttributeName: imageId
+            AttributeType: S
+        KeySchema:
+          - AttributeName: travelId
+            KeyType: HASH
+          - AttributeName: imageId
+            KeyType: RANGE
+        BillingMode: PAY_PER_REQUEST
+        TableName: ${self:provider.environment.REMINDER_IMAGES_TABLE}
+      
+    RequestBodyValidator:
+      Type: AWS::ApiGateway::RequestValidator
+      Properties:
+        Name: "request-body-validator"
+        RestApiId: 
+          Ref: ApiGatewayRestApi
+        ValidateRequestBody: true
+        ValidateRequestParameters: false
+
+    ReminderImagesBucket:
+      Type: AWS::S3::Bucket
+      DependsOn: SNSTopicPolicy
+      Properties:
+        BucketName: ${self:provider.environment.REMINDER_IMAGES_S3_BUCKET}
+        NotificationConfiguration:
+          TopicConfigurations:
+            - Event: s3:ObjectCreated:Put
+              Topic: !Ref ImagesTopic
+        CorsConfiguration:
+            CorsRules:
+              - 
+                AllowedMethods:
+                  - GET
+                  - PUT
+                  - POST
+                  - HEAD
+                  - DELETE
+                AllowedOrigins:
+                  - "*"
+                AllowedHeaders:
+                  - "*"
+                MaxAge: 3000
+    
+    BucketPolicy:
+      Type: AWS::S3::BucketPolicy
+      Properties:
+        PolicyDocument:
+          Id: ReminderImagesBucketPolicy
+          Version: "2012-10-17"
+          Statement:
+            - Sid: PublicReadForGetBucketObjects
+              Effect: Allow
+              Principal: "*"
+              Action: "s3:GetObject"
+              Resource: "arn:aws:s3:::${self:provider.environment.REMINDER_IMAGES_S3_BUCKET}/*"
+        Bucket: !Ref ReminderImagesBucket
+    
+    ImagesTopic:
+      Type: AWS::SNS::Topic
+      Properties:
+        DisplayName: Image bucket topic
+        TopicName: ${self:custom.topicName}
+
+    SNSTopicPolicy:
+      Type: AWS::SNS::TopicPolicy
+      Properties:
+        PolicyDocument:
+          Version: "2012-10-17"
+          Statement:
+            - Effect: Allow
+              Principal:
+                AWS: "*"
+              Action: sns:Publish
+              Resource:
+                !Ref ImagesTopic
+              Condition:
+                ArnLike:
+                  AWS:SourceArn: arn:aws:s3:::${self:provider.environment.REMINDER_IMAGES_S3_BUCKET}
+        Topics:
+          - !Ref ImagesTopic

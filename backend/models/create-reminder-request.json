@@ -1,0 +1,21 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema",
+    "title": "create reminder request schema json",
+    "type":"object",
+    "properties": {
+        "plannedDate":{
+            "type":"string"
+        },
+        "location":{
+            "type":"string"
+        },
+        "description":{
+            "type":"string"
+        },
+        "duration": {
+            "type":"number"
+        }
+    },
+    "required":["plannedDate","location","description","duration"],
+    "additionalProperties": false
+}
