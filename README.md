@@ -41,18 +41,18 @@ npm run start
 
 ![Alt text](images/application/2-AfterLoginShowReminders.png?raw=true "After Login")
 
-### Create Travel
+### Create Reminder
 
 ![Alt text](images/application/3-CreateAReminder.png?raw=true "Create Reminder")
 
-### Update Travel
+### Update Reminder
 
 ![Alt text](images/application/4-UpdatePageOfAReminder.png?raw=true "Update Reminder")
 
-### Show Travel Images
+### Show Reminder Images
 
 ![Alt text](images/application/5-UploadingImageOfAReminder.png?raw=true "Upload Reminder Images")
 
-### Upload Travel Image
+### Upload Reminder Image
 
 ![Alt text](images/application/6-ShowImagesOfAReminder.png?raw=true "Show Reminder Image")
