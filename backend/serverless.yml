@@ -58,7 +58,7 @@ functions:
       - http:
           method: get
           path: reminders
-          #authorizer: Auth
+          authorizer: Auth
           cors: true
     iamRoleStatementsName: ${self:provider.environment.APPNAME}-${self:provider.stage}-GetRemindersLambdaRole
     iamRoleStatements:
@@ -79,7 +79,7 @@ functions:
       - http:
           method: post
           path: reminders
-          #authorizer: Auth
+          authorizer: Auth
           cors: true
           reqValidatorName: RequestBodyValidator
           documentation:
@@ -106,7 +106,7 @@ functions:
       - http:
           method: patch
           path: reminders/{reminderId}
-          #authorizer: Auth
+          authorizer: Auth
           cors: true
           reqValidatorName: RequestBodyValidator
           documentation:
@@ -135,7 +135,7 @@ functions:
           method: delete
           path: reminders/{reminderId}
           cors: true
-          #authorizer: Auth
+          authorizer: Auth
     iamRoleStatementsName: ${self:provider.environment.APPNAME}-${self:provider.stage}-DeleteReminderLambdaRole
     iamRoleStatements:
       - Effect: Allow
@@ -165,7 +165,7 @@ functions:
       - http:
           method: post
           path: reminders/{reminderId}/image
-          #authorizer: Auth
+          authorizer: Auth
           cors: true
     iamRoleStatementsName: ${self:provider.environment.APPNAME}-${self:provider.stage}-GetUploadImageUrlLambdaRole
     iamRoleStatements:
@@ -221,7 +221,7 @@ functions:
       - http:
           method: get
           path: images/{reminderId}
-          #authorizer: Auth
+          authorizer: Auth
           cors: true
     iamRoleStatementsName: ${self:provider.environment.APPNAME}-${self:provider.stage}-GetReminderImagesLambdaRole
     iamRoleStatements:
